@@ -1,0 +1,45 @@
+{
+  "coord": {
+    "lon": 15.9775,
+    "lat": 45.8131
+  },
+  "weather": [
+    {
+      "id": 701,
+      "main": "Mist",
+      "description": "mist",
+      "icon": "50n"
+    }
+  ],
+  "base": "stations",
+  "main": {
+    "temp": 4.94,
+    "feels_like": 2.77,
+    "temp_min": 2.82,
+    "temp_max": 4.94,
+    "pressure": 998,
+    "humidity": 93,
+    "sea_level": 998,
+    "grnd_level": 979
+  },
+  "visibility": 1200,
+  "wind": {
+    "speed": 2.57,
+    "deg": 230
+  },
+  "clouds": {
+    "all": 100
+  },
+  "dt": 1769375430,
+  "sys": {
+    "type": 2,
+    "id": 2006646,
+    "country": "HR",
+    "sunrise": 1769322347,
+    "sunset": 1769356238
+  },
+  "timezone": 3600,
+  "id": 6618983,
+  "name": "Donji grad",
+  "cod": 200
+}
