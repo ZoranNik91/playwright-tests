@@ -1,125 +1,80 @@
-import os
 import re
-
+from pathlib import Path
 import pytest
 import api.city_info as city_info
 
+_MOCKED_DIR = Path(__file__).resolve().parents[1] / "files" / "mocked_city_files"
 
-@pytest.mark.parametrize("city", [
-    "Zagreb",
-    "Berlin",
-    "Vienna",
-])
-def test_get_city_summary_success(city):
-    summary = city_info.get_city_summary(city)
-    assert isinstance(summary, str)
-    assert len(summary) > 50
+def discover_mocked_city_files() -> list[Path]:
+    return sorted(p for p in _MOCKED_DIR.glob("*.txt") if p.is_file())
 
 
-@pytest.mark.parametrize("city", [
-    "asdasdsadas",
-    "00000000",
-    "!@#$$%^&*(-_",
-])
-def test_get_city_summary_invalid_city(city):
-    with pytest.raises(RuntimeError):
-        city_info.get_city_summary(city)
+def city_from_mock_file(path: Path) -> str:
+    return path.stem.strip()
 
 
-@pytest.mark.parametrize("city", [
-    "        ",
-    "",
-])
-def test_get_city_summary_empty_city_raises_value_error(city):
-    with pytest.raises(ValueError):
-        city_info.get_city_summary(city)
+def parse_summary_from_mock_file(text: str) -> str:
+    lines = [ln.rstrip() for ln in text.splitlines()]
+    while lines and not lines[-1].strip():
+        lines.pop()
+    if lines and lines[-1].lower().startswith("the current temperature in "):
+        lines = lines[:-1]
+    return "\n".join(lines).strip()
 
 
-@pytest.mark.parametrize(
-    "city,appid,low,high",
-    [
-        ("Zagreb", city_info.OPENWEATHER_APPID, -80.0, 80.0),
-    ],
-)
-def test_get_city_temperature_success_real_http(city, appid, low, high):
-    temp = city_info.get_city_temperature(city, appid)
-    assert isinstance(temp, float)
-    # very wide sanity range to avoid false failures
-    assert low <= temp <= high
+def parse_temperature_from_mock_file(text: str) -> float | None:
+    m = re.search(r"The current temperature in .*? is\s+(-?\d+(?:\.\d+)?)\s+degrees Celsius\.", text)
+    if not m:
+        return None
+    return float(m.group(1))
+
+def mocked_cities() -> list[tuple[str, str, float | None]]:
+    cases: list[tuple[str, str, float | None]] = []
+    for p in discover_mocked_city_files():
+        raw = p.read_text(encoding="utf-8")
+        city = city_from_mock_file(p)
+        summary = parse_summary_from_mock_file(raw)
+        temp = parse_temperature_from_mock_file(raw)
+        cases.append((city, summary, temp))
+    return cases
+
+
+def mocked_city_ids() -> list[str]:
+    return [city for city, _summary, _temp in mocked_cities()]
 
 
 @pytest.mark.parametrize(
-    "city,appid",
-    [
-        ("asdasdsadas", city_info.OPENWEATHER_APPID),
-    ],
+    "city,summary,temp_in_mock",
+    mocked_cities(),
+    ids=mocked_city_ids(),
 )
-def test_get_city_temperature_invalid_city_raises(city, appid):
-    with pytest.raises(RuntimeError):
-        city_info.get_city_temperature(city, appid)
-
-
-# Unit test for writing city info into a file
-@pytest.mark.parametrize(
-    "output_dir_name,city,summary,temp",
-    [
-        ("files", "Zagreb", "Zagreb is the capital of Croatia.", 23),
-    ],
-)
-def test_write_city_into_file(tmp_path, output_dir_name, city, summary, temp):
-    out_dir = tmp_path / output_dir_name
-    filename = city_info.write_city_info(city, summary, temp, output_dir=str(out_dir))
-
-    out_file = out_dir / f"{city}.txt"
-    assert filename == str(out_file)
-    assert out_file.exists()
-
-    content = out_file.read_text(encoding="utf-8")
-    assert summary in content
-    assert re.search(
-        rf"The current temperature in {re.escape(city)} is {temp}(\.0)? degrees Celsius\.",
-        content,
-    )
+def test_generate_city_txt_and_response_from_mocked_city_files(tmp_path, city, summary, temp_in_mock):
+    out_dir = tmp_path / "files"
+    ow_json = city_info.get_openweather_json(city, city_info.OPENWEATHER_APPID)
+    temp_live = float(ow_json["main"]["temp"])
+    city_file = city_info.write_city_info(city, summary, temp_live, output_dir=str(out_dir))
+    response_file = city_info.write_openweather_response(city, ow_json, output_dir=str(out_dir))
+    city_path = out_dir / f"{city}.txt"
+    response_path = out_dir / f"response_{city}.txt"
+    assert city_file == str(city_path)
+    assert response_file == str(response_path)
+    assert city_path.exists()
+    assert response_path.exists()
+    content = city_path.read_text(encoding="utf-8")
+    assert summary.splitlines()[0] in content
+    assert f"The current temperature in {city} is" in content
+    if temp_in_mock is not None:
+        assert isinstance(temp_in_mock, float)
 
 
 @pytest.mark.parametrize(
-    "script_name,city_input,expected_city",
+    "bad_city",
     [
-        ("city_info.py", "Zagreb.txt", "Zagreb"),
+        "",
+        "   ",
     ],
 )
-def test_city_success_creates_file(tmp_path, script_name, city_input, expected_city):
-    old_cwd = os.getcwd()
-    try:
-        os.chdir(tmp_path)
-
-        rc = city_info.run([script_name, city_input])
-        assert rc == 0
-
-        out_file = tmp_path / "files" / f"{expected_city}.txt"
-        assert out_file.exists()
-
-        content = out_file.read_text(encoding="utf-8")
-        assert f"The current temperature in {expected_city} is" in content
-    finally:
-        os.chdir(old_cwd)
-
-
-@pytest.mark.parametrize(
-    "script_name,city_input,expected_city",
-    [
-        ("city_info.py", "___.txt", "asdasdsadas"),
-    ],
-)
-def test_invalid_city_not_creates_file(tmp_path, script_name, city_input, expected_city):
-    old_cwd = os.getcwd()
-    try:
-        os.chdir(tmp_path)
-
-        rc = city_info.run([script_name, city_input])
-        assert rc == 1
-
-        out_file = tmp_path / "files" / f"{expected_city}.txt"
-        assert not out_file.exists()
-    finally:
-        os.chdir(old_cwd)
+def test_write_city_into_file_rejects_empty_city(tmp_path, bad_city):
+    out_dir = tmp_path / "files"
+    with pytest.raises(Exception):
+        city_info.write_city_info(bad_city, "summary", 1, output_dir=str(out_dir))

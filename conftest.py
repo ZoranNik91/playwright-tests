@@ -6,25 +6,21 @@ pytest_plugins = ["pytest_playwright"]
 DEFAULT_TIMEOUT_MS = 10000
 DEFAULT_VIEWPORT = {"width": 1920, "height": 1080}  # type: ignore
 
-
+# Hide loggers during tests
 def pytest_configure(config):
-    # Silence asyncio debug logs
     logging.getLogger("asyncio").setLevel(logging.WARNING)
-    # Silence noisy HTTP client debug logs (urllib3/requests)
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     logging.getLogger("urllib3.connectionpool").setLevel(logging.WARNING)
     logging.getLogger("requests").setLevel(logging.WARNING)
 
 @pytest.fixture
 def context(browser):
-    """Create a browser context with a consistent viewport size."""
     context = browser.new_context(viewport=DEFAULT_VIEWPORT)  # type: ignore[arg-type]
     yield context
     context.close()
 
 @pytest.fixture
 def page(context):
-    """Override pytest-playwright's page fixture to apply default timeouts."""
     page = context.new_page()
     page.set_default_timeout(DEFAULT_TIMEOUT_MS)
     yield page
