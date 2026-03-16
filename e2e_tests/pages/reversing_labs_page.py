@@ -6,8 +6,30 @@ import requests
 
 
 class ReversingLabsPage:
+
+    # locators
     HOME_URL = "https://www.reversinglabs.com/"
 
+    productAndTechnology = ".main-nav_category__dMVd6"
+    productAndTechnologyText = "Product & Technology"
+
+    spectraAnalyze = "/products/spectra-analyze"
+    spectraAnalyzeLink = f'a[href="{spectraAnalyze}"]'
+    spectraAnalyzeUrl = f"https://www.reversinglabs.com{spectraAnalyze}"
+    spectraAnalyzeText = "Spectra Analyze"
+
+    slideContainerH1 = ".slide_container__EGEZp h1"
+    slideContainerH1Text = "Efficacy. Speed. Privacy. Malware Analysis that Delivers."
+
+    spectraDetect = "/products/reversinglabs-spectra-detect"
+    spectraDetectLink = f'a[href="{spectraDetect}"]'
+    spectraDetectText = "Spectra Detect"
+
+    downloadDatasheet = ".button_button__iBnBy"
+    downloadDatasheetText = "DOWNLOAD DATASHEET"
+
+
+    # logger functions
     def __init__(self, page):
         self.page = page
         self.logger = logging.getLogger(self.__class__.__name__)

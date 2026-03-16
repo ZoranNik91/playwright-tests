@@ -4,46 +4,42 @@ from urllib.parse import urlparse
 
 def test_reversing_labs(page):
     rl = ReversingLabsPage(page)
-    reversing_labs_url = "https://www.reversinglabs.com/"
 
-    rl.go_to_website(reversing_labs_url)
+    rl.go_to_website(ReversingLabsPage.HOME_URL)
 
     assert "ReversingLabs" in page.title()
 
-    assert rl.is_visible_by_selector_and_text(".main-nav_category__dMVd6", "Product & Technology")
-    rl.click_by_selector_and_text(".main-nav_category__dMVd6", "Product & Technology")
+    assert rl.is_visible_by_selector_and_text(ReversingLabsPage.productAndTechnology, ReversingLabsPage.productAndTechnologyText)
+    rl.click_by_selector_and_text(ReversingLabsPage.productAndTechnology, ReversingLabsPage.productAndTechnologyText)
 
-    assert rl.is_visible_by_selector_and_text('a[href="/products/spectra-analyze"]', "Spectra Analyze")
-    rl.click_by_selector_and_text('a[href="/products/spectra-analyze"]', "Spectra Analyze")
+    assert rl.is_visible_by_selector_and_text(ReversingLabsPage.spectraAnalyzeLink, ReversingLabsPage.spectraAnalyzeText)
+    rl.click_by_selector_and_text(ReversingLabsPage.spectraAnalyzeLink, ReversingLabsPage.spectraAnalyzeText)
 
-    page.wait_for_url("**/products/spectra-analyze**")
-    assert "/products/spectra-analyze" in page.url
+    page.wait_for_url(f"**{ReversingLabsPage.spectraAnalyze}**")
+    assert ReversingLabsPage.spectraAnalyze in page.url
 
     spectra_analyze_title = "Advanced Malware Analysis & Threat Hunting | ReversingLabs"
     assert page.title() == spectra_analyze_title
 
-    assert rl.is_visible_by_selector_and_text(
-        ".slide_container__EGEZp h1",
-        "Efficacy. Speed. Privacy. Malware Analysis that Delivers.",
-    )
+    assert rl.is_visible_by_selector_and_text(ReversingLabsPage.slideContainerH1, ReversingLabsPage.slideContainerH1Text)
 
-    assert rl.is_visible_by_selector_and_text(".main-nav_category__dMVd6", "Product & Technology")
-    rl.click_by_selector_and_text(".main-nav_category__dMVd6", "Product & Technology")
+    assert rl.is_visible_by_selector_and_text(ReversingLabsPage.productAndTechnology, ReversingLabsPage.productAndTechnologyText)
+    rl.click_by_selector_and_text(ReversingLabsPage.productAndTechnology, ReversingLabsPage.productAndTechnologyText)
 
-    assert rl.is_visible_by_selector_and_text('a[href="/products/reversinglabs-spectra-detect"]', "Spectra Detect")
-    rl.click_by_selector_and_text('a[href="/products/reversinglabs-spectra-detect"]', "Spectra Detect")
+    assert rl.is_visible_by_selector_and_text(ReversingLabsPage.spectraDetectLink, ReversingLabsPage.spectraDetectText)
+    rl.click_by_selector_and_text(ReversingLabsPage.spectraDetectLink, ReversingLabsPage.spectraDetectText)
 
-    page.wait_for_url("**/products/reversinglabs-spectra-detect**")
-    assert "/products/reversinglabs-spectra-detect" in page.url
+    page.wait_for_url(f"**{ReversingLabsPage.spectraDetect}**")
+    assert ReversingLabsPage.spectraDetect in page.url
 
     assert page.title() != spectra_analyze_title
 
-    rl.go_to_website("https://www.reversinglabs.com/products/spectra-analyze")
+    rl.go_to_website(ReversingLabsPage.spectraAnalyzeUrl)
 
-    assert rl.is_visible_by_selector_and_text(".button_button__iBnBy", "DOWNLOAD DATASHEET")
+    assert rl.is_visible_by_selector_and_text(ReversingLabsPage.downloadDatasheet, ReversingLabsPage.downloadDatasheetText)
 
     # Get expected PDF URL + filename from the actual link
-    expected_pdf_url = rl.get_link_href(".button_button__iBnBy", "DOWNLOAD DATASHEET")
+    expected_pdf_url = rl.get_link_href(ReversingLabsPage.downloadDatasheet, ReversingLabsPage.downloadDatasheetText)
     assert expected_pdf_url, "DOWNLOAD DATASHEET link has no href"
 
     parsed = urlparse(expected_pdf_url)
@@ -56,8 +52,8 @@ def test_reversing_labs(page):
     rl.remove_file_if_exists(target_file)
 
     saved_path, download_url = rl.download_file_by_selector_and_text(
-        ".button_button__iBnBy",
-        "DOWNLOAD DATASHEET",
+        ReversingLabsPage.downloadDatasheet,
+        ReversingLabsPage.downloadDatasheetText,
         downloads_dir,
         filename=expected_filename,
     )
