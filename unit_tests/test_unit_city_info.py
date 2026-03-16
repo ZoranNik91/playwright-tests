@@ -22,7 +22,6 @@ def parse_summary_from_mock_file(text: str) -> str:
     return "\n".join(lines).strip()
 
 
-
 def parse_temperature_from_mock_file(text: str) -> float | None:
     m = re.search(r"The current temperature in .*? is\s+(-?\d+(?:\.\d+)?)\s+degrees Celsius\.", text)
     if not m:

@@ -1,0 +1,48 @@
+{
+  "coord": {
+    "lon": 15.9775,
+    "lat": 45.8131
+  },
+  "weather": [
+    {
+      "id": 500,
+      "main": "Rain",
+      "description": "light rain",
+      "icon": "10n"
+    }
+  ],
+  "base": "stations",
+  "main": {
+    "temp": 9.38,
+    "feels_like": 6.4,
+    "temp_min": 8.82,
+    "temp_max": 9.38,
+    "pressure": 1019,
+    "humidity": 74,
+    "sea_level": 1019,
+    "grnd_level": 1000
+  },
+  "visibility": 10000,
+  "wind": {
+    "speed": 6.17,
+    "deg": 20
+  },
+  "rain": {
+    "1h": 0.24
+  },
+  "clouds": {
+    "all": 75
+  },
+  "dt": 1773696242,
+  "sys": {
+    "type": 2,
+    "id": 2006646,
+    "country": "HR",
+    "sunrise": 1773637646,
+    "sunset": 1773680534
+  },
+  "timezone": 3600,
+  "id": 6618983,
+  "name": "Donji grad",
+  "cod": 200
+}
