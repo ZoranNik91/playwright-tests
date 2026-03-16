@@ -22,6 +22,7 @@ def parse_summary_from_mock_file(text: str) -> str:
     return "\n".join(lines).strip()
 
 
+
 def parse_temperature_from_mock_file(text: str) -> float | None:
     m = re.search(r"The current temperature in .*? is\s+(-?\d+(?:\.\d+)?)\s+degrees Celsius\.", text)
     if not m:
@@ -48,8 +49,8 @@ def mocked_city_ids() -> list[str]:
     mocked_cities(),
     ids=mocked_city_ids(),
 )
-def test_generate_city_txt_and_response_from_mocked_city_files(tmp_path, city, summary, temp_in_mock):
-    out_dir = tmp_path / "files"
+def test_generate_city_txt_and_response_from_mocked_city_files(city, summary, temp_in_mock):
+    out_dir = Path(__file__).resolve().parents[1] / "files"
     ow_json = city_info.get_openweather_json(city, city_info.OPENWEATHER_APPID)
     temp_live = float(ow_json["main"]["temp"])
     city_file = city_info.write_city_info(city, summary, temp_live, output_dir=str(out_dir))

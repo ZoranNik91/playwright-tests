@@ -30,11 +30,11 @@ def test_reversing_labs(page):
     assert rl.is_visible_by_selector_and_text(".main-nav_category__dMVd6", "Product & Technology")
     rl.click_by_selector_and_text(".main-nav_category__dMVd6", "Product & Technology")
 
-    assert rl.is_visible_by_selector_and_text('a[href="/products/spectra-detect"]', "Spectra Detect")
-    rl.click_by_selector_and_text('a[href="/products/spectra-detect"]', "Spectra Detect")
+    assert rl.is_visible_by_selector_and_text('a[href="/products/reversinglabs-spectra-detect"]', "Spectra Detect")
+    rl.click_by_selector_and_text('a[href="/products/reversinglabs-spectra-detect"]', "Spectra Detect")
 
-    page.wait_for_url("**/products/spectra-detect**")
-    assert "/products/spectra-detect" in page.url
+    page.wait_for_url("**/products/reversinglabs-spectra-detect**")
+    assert "/products/reversinglabs-spectra-detect" in page.url
 
     assert page.title() != spectra_analyze_title
 

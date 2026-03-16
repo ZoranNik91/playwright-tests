@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python scripts/generate_city_outputs_from_mocked.py)",
+      "Bash(python -m scripts.generate_city_outputs_from_mocked)",
+      "Bash(python -m pytest --ignore=e2e_tests -v)",
+      "Bash(python -m pytest unit_tests/ -v)"
+    ]
+  }
+}

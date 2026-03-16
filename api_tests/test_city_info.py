@@ -24,6 +24,7 @@ def test_run_empty_city_errors(capsys):
     "appid,city,expected_country,timeout_s",
     [
         ("7d2d3e43f13bb33a3ffc504a4ae499ca", "Zagreb", "HR", 20),
+        ("7d2d3e43f13bb33a3ffc504a4ae499ca", "Dublin,IE", "IE", 10),
     ],
 )
 def test_openweather_live_saves_response_to_city_txt(appid, city, expected_country, timeout_s):
