@@ -1,5 +1,7 @@
 from pathlib import Path
 import re
+import json
+import requests
 
 import api.city_info as city_info
 import pytest
@@ -129,3 +131,35 @@ def test_get_city_summary_live(city):
     assert isinstance(summary, str)
     assert len(summary) > 30
     assert city.lower() in summary.lower()
+
+
+# Api test with existing city
+@pytest.mark.parametrize(
+    "appid,city,expected_country,timeout_s",
+    [
+        ("7d2d3e43f13bb33a3ffc504a4ae499ca", "Zagreb", "HR", 20),
+        ("7d2d3e43f13bb33a3ffc504a4ae499ca", "Dublin,IE", "IE", 10),
+    ],
+)
+def test_openweather_live_saves_response_to_city_txt(appid, city, expected_country, timeout_s):
+    url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={appid}&units=metric"
+
+    r = requests.get(url, timeout=timeout_s)
+    assert r.status_code == 200
+
+    data = r.json()
+    assert str(data.get("cod")) == "200"
+    assert "main" in data and "temp" in data["main"]
+
+    if expected_country is not None:
+        assert data.get("sys", {}).get("country") == expected_country
+
+    REPO_FILES_DIR.mkdir(parents=True, exist_ok=True)
+    out_file = REPO_FILES_DIR / f"response_{city}.txt"
+
+    out_file.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    assert out_file.exists()
+
+    saved = json.loads(out_file.read_text(encoding="utf-8"))
+    assert "main" in saved and "temp" in saved["main"]
+    assert str(saved.get("cod")) == "200"

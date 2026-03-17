@@ -29,7 +29,7 @@ class ReversingLabsPage:
     downloadDatasheetText = "DOWNLOAD DATASHEET"
 
 
-    # logger functions
+    # functions
     def __init__(self, page):
         self.page = page
         self.logger = logging.getLogger(self.__class__.__name__)
