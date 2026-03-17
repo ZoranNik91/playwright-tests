@@ -7,6 +7,7 @@ import json
 
 DEFAULT_TIMEOUT_S: float = 10.0
 OPENWEATHER_APPID = "7d2d3e43f13bb33a3ffc504a4ae499ca"
+WIKI_URL = "https://en.wikipedia.org/api/rest_v1/page/summary/"
 
 
 def format_city_file(city_name: str) -> str:
@@ -30,7 +31,7 @@ def get_city_summary(city_name: str) -> str:
     city_name = city_name.strip()
     if not city_name:
         raise ValueError("City name cannot be empty")
-    url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{quote(city_name)}"
+    url = f"{WIKI_URL}{quote(city_name)}"
     headers = {
         # Wikipedia REST API may return 403 without a descriptive User-Agent.
         "User-Agent": "playwright-test",
