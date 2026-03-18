@@ -78,3 +78,33 @@ def test_write_city_into_file_rejects_empty_city(tmp_path, bad_city):
     out_dir = tmp_path / "files"
     with pytest.raises(Exception):
         city_info.write_city_info(bad_city, "summary", 1, output_dir=str(out_dir))
+
+
+# Coldest ever recorded on Earth: -89.2°C (Antarctica, 1983)
+# Hottest ever recorded on Earth:  56.7°C (Death Valley, 1913)
+EARTH_MIN_TEMP = -89.2
+EARTH_MAX_TEMP = 56.7
+
+
+def is_earth_temperature(temp: float) -> bool:
+    return EARTH_MIN_TEMP <= temp <= EARTH_MAX_TEMP
+
+# This unit test checks valid temperature api response in case api response returns impossible temperature
+@pytest.mark.parametrize(
+    "value, expected_valid",
+    [
+        (-90.0,   False),
+        (-273.15, False), 
+        (57.0,    False),
+        (1000.0,  False),
+    ] + [(city, True) for city, _summary, _temp in mocked_cities()],
+    ids=[
+        "below_coldest", "absolute_zero", "above_hottest", "extreme_heat",
+    ] + [city for city, _summary, _temp in mocked_cities()],
+)
+def test_impossible_temp_on_earth(value, expected_valid):
+    temp = city_info.get_city_temperature(value, city_info.OPENWEATHER_APPID) if isinstance(value, str) else value
+    assert is_earth_temperature(temp) == expected_valid, (
+        f"{temp}°C should {'be' if expected_valid else 'not be'} "
+        f"within Earth range [{EARTH_MIN_TEMP}, {EARTH_MAX_TEMP}]"
+    )

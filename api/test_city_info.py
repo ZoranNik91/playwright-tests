@@ -42,13 +42,6 @@ def mocked_city_case_ids() -> list[str]:
     return [city for city, _summary in mocked_city_cases()]
 
 
-def case_id(case) -> str:
-    try:
-        return str(case[0])
-    except Exception:
-        return "case"
-
-
 @pytest.mark.parametrize("script_name", ["city_info.py"])
 def test_run_missing_city_name_exits_2(capsys, script_name):
     rc = city_info.run([script_name])  # no args

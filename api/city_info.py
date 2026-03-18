@@ -8,13 +8,14 @@ import json
 DEFAULT_TIMEOUT_S: float = 10.0
 OPENWEATHER_APPID = "7d2d3e43f13bb33a3ffc504a4ae499ca"
 WIKI_URL = "https://en.wikipedia.org/api/rest_v1/page/summary/"
+USAGE_MESSAGE = "Usage: python api/city_info.py <city_or_city.txt> [openweathermap_api_key]"
 
 
 def format_city_file(city_name: str) -> str:
     city_name = city_name.strip()
-    # Replace path separators and other problematic characters
-    city_name = re.sub(r"[\\/\0]", "_", city_name)
-    city_name = re.sub(r"\s+", " ", city_name)
+    # Replace path separators and other problematic characters (for file system safety)
+    city_name = re.sub(r"[\\/\0]", "_", city_name)  # in case 'New\York' -> 'respone_New York'
+    city_name = re.sub(r"\s+", " ", city_name)      # in case 'New\t   York' -> 'New York'
     return city_name
 
 
@@ -122,9 +123,6 @@ def write_openweather_response(city_name: str, openweather_json: dict, *, output
     with open(filename, "w", encoding="utf-8") as f:
         f.write(json.dumps(openweather_json, ensure_ascii=False, indent=2))
     return filename
-
-
-USAGE_MESSAGE = "Usage: python api/city_info.py <city_or_city.txt> [openweathermap_api_key]"
 
 
 def print_usage(message: str = USAGE_MESSAGE):
