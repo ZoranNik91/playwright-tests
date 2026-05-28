@@ -50,7 +50,7 @@ pytest
 pytest --headed --slowmo 200 -s
 ```
 
-### Sell Script
+### Shell Script
 - Run e2e tests headed with shell script:
   - `source .venv/bin/activate && pytest --headed --slowmo 200 -s`
 
